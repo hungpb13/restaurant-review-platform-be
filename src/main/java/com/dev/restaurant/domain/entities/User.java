@@ -16,6 +16,7 @@ public class User {
     @Field(type = FieldType.Keyword)
     private String id;
 
+    @Field(type = FieldType.Text)
     private String username;
 
     @Field(type = FieldType.Text)

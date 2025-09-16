@@ -9,6 +9,10 @@ import com.dev.restaurant.mappers.ReviewMapper;
 import com.dev.restaurant.services.ReviewService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -39,6 +43,21 @@ public class ReviewController {
                 reviewMapper.toReviewDto(createdReview),
                 HttpStatus.CREATED
         );
+    }
+
+    @GetMapping
+    public Page<ReviewDto> getReviews(
+            @PathVariable("restaurantId") String restaurantId,
+            @PageableDefault(
+                    size = 20,
+                    page = 0,
+                    sort = "datePosted",
+                    direction = Sort.Direction.DESC
+            ) Pageable pageable
+    ) {
+        return reviewService
+                .getReviews(restaurantId, pageable)
+                .map(reviewMapper::toReviewDto);
     }
 
     private User jwtToUser(Jwt jwt) {

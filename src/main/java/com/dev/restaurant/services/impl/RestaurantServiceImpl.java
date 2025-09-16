@@ -5,6 +5,7 @@ import com.dev.restaurant.domain.entities.Address;
 import com.dev.restaurant.domain.entities.Photo;
 import com.dev.restaurant.domain.entities.Restaurant;
 import com.dev.restaurant.domain.requests.RestaurantCreateUpdateRequest;
+import com.dev.restaurant.exceptions.RestaurantNotFoundException;
 import com.dev.restaurant.repositories.RestaurantRepository;
 import com.dev.restaurant.services.GeoLocationService;
 import com.dev.restaurant.services.RestaurantService;
@@ -79,5 +80,31 @@ public class RestaurantServiceImpl implements RestaurantService {
     @Override
     public Optional<Restaurant> getRestaurant(String id) {
         return restaurantRepository.findById(id);
+    }
+
+    @Override
+    public Restaurant updateRestaurant(String id, RestaurantCreateUpdateRequest request) {
+        Restaurant existingRestaurant = getRestaurant(id)
+                .orElseThrow(() -> new RestaurantNotFoundException("Restaurant not found with id: " + id));
+
+        GeoLocation newGeoLocation = geoLocationService.geoLocation(request.getAddress());
+        GeoPoint newGeoPoint = new GeoPoint(newGeoLocation.getLatitude(), newGeoLocation.getLongitude());
+
+        List<String> photoIds = request.getPhotoIds();
+        List<Photo> photos = photoIds.stream().map(photoUrl -> Photo.builder()
+                .url(photoUrl)
+                .uploadDate(LocalDateTime.now())
+                .build()
+        ).toList();
+
+        existingRestaurant.setName(request.getName());
+        existingRestaurant.setCuisineType(request.getCuisineType());
+        existingRestaurant.setContactInformation(request.getContactInformation());
+        existingRestaurant.setAddress(request.getAddress());
+        existingRestaurant.setGeoLocation(newGeoPoint);
+        existingRestaurant.setOperatingHours(request.getOperatingHours());
+        existingRestaurant.setPhotos(photos);
+
+        return restaurantRepository.save(existingRestaurant);
     }
 }

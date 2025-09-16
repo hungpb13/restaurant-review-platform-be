@@ -14,4 +14,6 @@ public interface ReviewService {
     Page<Review> getReviews(String restaurantId, Pageable pageable);
 
     Optional<Review> getReview(String restaurantId, String reviewId);
+
+    Review updateReview(User author, String restaurantId, String reviewId, ReviewCreateUpdateRequest request);
 }

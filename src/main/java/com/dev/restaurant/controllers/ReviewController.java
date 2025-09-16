@@ -71,6 +71,22 @@ public class ReviewController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @PutMapping(path = "/{reviewId}")
+    public ResponseEntity<ReviewDto> updateReview(
+            @PathVariable("restaurantId") String restaurantId,
+            @PathVariable("reviewId") String reviewId,
+            @Valid @RequestBody ReviewCreateUpdateRequestDto requestDto,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        ReviewCreateUpdateRequest request = reviewMapper.toReviewCreateUpdateRequest(requestDto);
+
+        User user = jwtToUser(jwt);
+
+        Review updatedReview = reviewService.updateReview(user, restaurantId, reviewId, request);
+
+        return ResponseEntity.ok(reviewMapper.toReviewDto(updatedReview));
+    }
+
     private User jwtToUser(Jwt jwt) {
         return User.builder()
                 .id(jwt.getSubject())

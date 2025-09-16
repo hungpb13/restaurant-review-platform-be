@@ -20,6 +20,7 @@ public interface RestaurantMapper {
 
     RestaurantCreateUpdateRequest toRestaurantCreateUpdateRequest(RestaurantCreateUpdateRequestDto dto);
 
+    @Mapping(target = "totalReviews", source = "reviews", qualifiedByName = "populateTotalReviews")
     RestaurantDto toRestaurantDto(Restaurant restaurant);
 
     @Mapping(target = "totalReviews", source = "reviews", qualifiedByName = "populateTotalReviews")

@@ -3,6 +3,7 @@ package com.dev.restaurant.controllers;
 import com.dev.restaurant.domain.dtos.ErrorDto;
 import com.dev.restaurant.exceptions.BaseException;
 import com.dev.restaurant.exceptions.RestaurantNotFoundException;
+import com.dev.restaurant.exceptions.ReviewNotAllowedException;
 import com.dev.restaurant.exceptions.StorageException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -98,6 +99,21 @@ public class ErrorController {
         return new ResponseEntity<>(
                 errorDto,
                 HttpStatus.NOT_FOUND
+        );
+    }
+
+    @ExceptionHandler(ReviewNotAllowedException.class)
+    public ResponseEntity<ErrorDto> handleReviewNotAllowedException(ReviewNotAllowedException e) {
+        log.error("Caught ReviewNotAllowedException: ", e);
+
+        ErrorDto errorDto = ErrorDto.builder()
+                .status(HttpStatus.BAD_REQUEST.value())
+                .message("The specified review cannot be created or updated")
+                .build();
+
+        return new ResponseEntity<>(
+                errorDto,
+                HttpStatus.BAD_REQUEST
         );
     }
 }
